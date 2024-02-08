@@ -68,16 +68,18 @@ private:
 
 class Player {
 public:
-    Player() : betAmount(0), numMines(0), totalProfit(0), playing(true) {}
+    Player() : betAmount(0), numMines(0), totalProfit(0), chipBalance(0), playing(true) {}
 
     void setBetAmount(int amount) { betAmount = amount; }
     void setNumMines(int mines) { numMines = mines; }
     void setTotalProfit(int profit) { totalProfit = profit; }
     void setPlaying(bool status) { playing = status; }
+    void setChipBalance(int balance) { chipBalance = balance; }
 
     int getBetAmount() const { return betAmount; }
     int getNumMines() const { return numMines; }
     int getTotalProfit() const { return totalProfit; }
+    int getChipBalance() const { return chipBalance; }
 
     bool isPlaying() const { return playing; }
     void endRound() { playing = false; }
@@ -87,15 +89,19 @@ private:
     int numMines;
     int totalProfit;
     bool playing;
+    int chipBalance;
+    int id;
 };
 
 class MinesweeperGame {
 public:
-    MinesweeperGame() : multiplier(1.0), rtp(0.99), houseEdge(0.01), boardSize(4) {}
+    MinesweeperGame() : rtp(0.99), houseEdge(0.01), boardSize(4), consecutiveWins(0) {}
 
     void startGame(Player& player, MinesweeperGame& game) {
-    // Set the number of mines based on the player's choice
-    int chosenMines;
+        // Reset consecutive wins and multiplier
+        consecutiveWins = 0;
+        multiplier = 1.0;
+        int chosenMines;
 
     while (true) {
         cout << "Enter the number of mines (1-15): ";
@@ -116,6 +122,18 @@ public:
     // Clear the input buffer
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+    int betAmount;
+    cout << "Enter your bet amount (1-" << player.getChipBalance() << "): ";
+    while (true) {
+        betAmount = getIntegerInput();
+        if (betAmount < 1 || betAmount > player.getChipBalance()) {
+            cout << "Invalid bet amount. Please enter a number between 1 and " << player.getChipBalance() << ": ";
+        } else {
+            break;
+        }
+    }
+        player.setBetAmount(betAmount);
+
     // Initialize game state for a new game
     player.setTotalProfit(0);
     player.setPlaying(true);
@@ -129,16 +147,31 @@ public:
 }
 
 
-    void revealTile(Tile& tile, Player& player) {
-        tile.reveal();
+void revealTile(Tile& tile, Player& player) {
+     if (tile.getState() == Tile::REVEALED) {
+            cout << "This tile has already been revealed. Please choose another one." << endl;
+            return;
+        }
+    tile.reveal();
+    int newBalance;
 
-        if (tile.containsMine()) {
-            player.endRound();
-        } else {
-            // Calculate and update total profit
-            player.setTotalProfit(player.getTotalProfit() + player.getBetAmount() * multiplier);
+    if (tile.containsMine()) {
+        player.endRound();
+        newBalance = player.getChipBalance() - player.getBetAmount();
+        player.setChipBalance(newBalance);
+    } else {
+        // Calculate and update winnings
+        int winnings = player.getBetAmount() * multiplier;
+        player.setTotalProfit(player.getTotalProfit() + winnings);
+        // Update chip balance
+        newBalance = player.getChipBalance() + winnings;
+        player.setChipBalance(newBalance);
+        if (player.getChipBalance() <= 0) {
+            player.endRound(); 
+            cout << "You have run out of chips. Game Over." << endl;
         }
     }
+}
 
     double calculateMultiplier(int numMines) const {
         // Calculate multiplier based on the number of mines
@@ -189,6 +222,7 @@ private:
     const double rtp;
     const double houseEdge;
     const int boardSize;
+    int consecutiveWins;
     vector<Tile> tiles;
 };
 
@@ -200,11 +234,13 @@ int main() {
     // Create Minesweeper game instance
     MinesweeperGame game;
 
+    // Create player
+    Player player;
+    player.setChipBalance(100);
 
-
+    char playAgain;
     do {
-        // Create player
-        Player player;
+        
         game.startGame(player, game);
         // Continue the game until the player chooses to start a new game or the game ends
         while (player.isPlaying()) {
@@ -221,9 +257,13 @@ int main() {
 
             game.revealTile(game.getTile(row, col), player);
 
-            // Check if the round has ended
-            if (!player.isPlaying()) {
-                cout << "Total Profit: $" << player.getTotalProfit() << endl;
+            cout << "Total Winnings: $" << player.getTotalProfit() << endl;
+            cout << "Current Chip Balance: $" << player.getChipBalance() << endl;
+            cout << "Do you want to continue playing? (Y/N): ";
+            cin >> playAgain;
+
+            if (tolower(playAgain) != 'y') {
+                player.endRound();
                 break;
             }
         }
