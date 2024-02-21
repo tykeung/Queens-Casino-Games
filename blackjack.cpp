@@ -98,7 +98,7 @@ int getCardValue(Card card)
     {
     case ACE:
         value = 11; // Initially consider Ace as 11
-        //Do I need to pass in the hand or the points?
+        // Do I need to pass in the hand or the points?
         break;
     case JACK:
     case QUEEN:
@@ -118,10 +118,21 @@ int getCardValue(Card card)
 
 int calculatePoints(vector<Card> hand)
 {
+    int aces = 0;
     int total = 0;
     for (Card card : hand)
     {
+        if (card.rank == ACE)
+        {
+            aces++;
+        }
         total += getCardValue(card);
+    }
+
+    while (aces > 0 and total > 21)
+    {
+        aces--;
+        total -= 10;
     }
 
     return total;
@@ -170,7 +181,8 @@ int main()
             cout << "Your hand: ";
             for (Card card : playerHand)
             {
-                cout << getCardRank(card) << "(" << getCardValue(card) << ") ";
+                //cout << getCardRank(card) << "(" << getCardValue(card) << ") ";
+                cout << getCardRank(card)  << " ";
             }
 
             cout << endl
