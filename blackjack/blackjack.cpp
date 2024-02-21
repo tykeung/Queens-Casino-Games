@@ -1,3 +1,8 @@
+// To add
+// 1. tell player value of dealer's hand
+// 2. make dealers turn function in real time instead of skipping to final hand
+// 3. splitting
+
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -192,8 +197,10 @@ int main()
 
             if (choice == 'h')
             {
-                playerHand.push_back(deck.dealCard());
+                Card newCard = deck.dealCard();
+                playerHand.push_back(newCard);
                 playerTotal = calculatePoints(playerHand);
+                cout << "You drew a " << getCardRank(newCard) << endl;
                 if (playerTotal > 21)
                 {
                     cout << "Busted! You lose." << endl;
@@ -213,9 +220,37 @@ int main()
         }
 
         // loop for Dealer's turn
-        // while (true)
-        // {
-        // }
+        if (!playerBusted) {
+            while (true) {
+
+                dealerTotal = calculatePoints(dealerHand);
+                if (dealerTotal >= 17) {
+                    break;
+                }
+                dealerHand.push_back(deck.dealCard());
+            }
+
+            cout << "Dealer's hand: ";
+            for (const auto& card : dealerHand) {
+                cout << getCardValue(card) << " ";
+            }
+            cout << endl;
+
+            if (dealerTotal > 21 ) {
+                cout << "The dealer busted! You win!" << endl;
+                balance += bet;
+            }else if(playerTotal > dealerTotal) {
+                cout << "You win!" << endl;
+                balance += bet;
+            }
+             else if (dealerTotal > playerTotal) {
+                cout << "Dealer wins!" << endl;
+                balance -= bet;
+            } else {
+                cout << "It's a tie! The dealer wins..." << endl;
+                balance -= bet;
+            }
+        }
 
         cout << "Your balance: $" << balance << endl;
 
