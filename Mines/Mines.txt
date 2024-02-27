@@ -319,10 +319,6 @@ int main() {
                 char endRoundChoice;
                 cout << "Do you want to continue this round? (Y/N): ";
                 cin >> endRoundChoice;
-                while (endRoundChoice != 'Y' && endRoundChoice != 'y' && endRoundChoice != 'N' && endRoundChoice != 'n') {
-                cout << "Invalid input. Please enter 'Y' or 'N': ";
-                cin >> endRoundChoice;
-        }
                 if (tolower(endRoundChoice) == 'n') {
                     // Add total winnings to chip balance if the round ends
                     player.setChipBalance(player.getChipBalance() + player.getTotalProfit() - player.getBetAmount());
