@@ -173,12 +173,15 @@ int main()
 
         // Deal cards from deck into hands
         playerHand.push_back(deck.dealCard());
-        dealerHand.push_back(deck.dealCard());
+        Card dealerFaceUp = deck.dealCard();
+        dealerHand.push_back(dealerFaceUp);
         playerHand.push_back(deck.dealCard());
         dealerHand.push_back(deck.dealCard());
 
         playerTotal = calculatePoints(playerHand);
         dealerTotal = calculatePoints(dealerHand);
+
+        cout << "Dealer's face up card: " << getCardRank(dealerFaceUp) << endl;        
 
         // loop for Player's turn
         while (true)
