@@ -3,7 +3,10 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLabel>
+#include <QSlider>
 #include <QStackedWidget>
+#include "blackjack_menu.h"
+#include "dice_menu.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -12,33 +15,38 @@ int main(int argc, char *argv[]) {
     window.setWindowTitle("Queen's Casino Games");
     QStackedWidget stackedWidget(&window);
 
-    QVBoxLayout *main_menu = new QVBoxLayout;
-    QPushButton *blackjack_menu = new QPushButton("Blackjack", &window);
-    QPushButton *dice_menu = new QPushButton("Dice", &window);
-    QPushButton *crash_menu = new QPushButton("Crash", &window);
-    QLabel *label1 = new QLabel("Queen's Casino Games", &window);
-    main_menu->addWidget(label1);
-    main_menu->addWidget(blackjack_menu);
-    main_menu->addWidget(dice_menu);
-    main_menu->addWidget(crash_menu);
 
-    QObject::connect(blackjack_menu, &QPushButton::clicked, [&]() {
+    QVBoxLayout *main_menu = new QVBoxLayout;
+    QPushButton *blackjack_game_button = new QPushButton("Blackjack", &window);
+    QPushButton *dice_game_button = new QPushButton("Dice", &window);
+    QPushButton *mines_game_button = new QPushButton("Crash", &window);
+    QLabel *label1 = new QLabel("Queen's Casino Games", &window);
+    label1->setAlignment(Qt::AlignCenter); // Center align the label
+    label1->setStyleSheet("font-size: 36pt");
+    main_menu->addWidget(label1);
+    main_menu->addWidget(blackjack_game_button);
+    main_menu->addWidget(dice_game_button);
+    main_menu->addWidget(mines_game_button);
+
+    QObject::connect(blackjack_game_button, &QPushButton::clicked, [&]() {
         stackedWidget.setCurrentIndex(1);
     });
 
-    QObject::connect(dice_menu, &QPushButton::clicked, [&]() {
+    QObject::connect(dice_game_button, &QPushButton::clicked, [&]() {
         stackedWidget.setCurrentIndex(2);
     });
 
-    QObject::connect(crash_menu, &QPushButton::clicked, [&]() {
+    int window_width = window.sizeHint().width();
+
+    QObject::connect(mines_game_button, &QPushButton::clicked, [&]() {
         stackedWidget.setCurrentIndex(3);
     });
 
 
     QVBoxLayout *blackjack_game = new QVBoxLayout;
     QPushButton *blackjack_backtomenu = new QPushButton("Back to main menu", &window);
-    QLabel *blackjack_label = new QLabel("blackjack here", &window);
-    blackjack_game->addWidget(blackjack_label);
+    blackjack_menu *blackjack_widget = new blackjack_menu(&window);
+    blackjack_game->addWidget(blackjack_widget);
     blackjack_game->addWidget(blackjack_backtomenu);
 
 
@@ -48,11 +56,14 @@ int main(int argc, char *argv[]) {
 
     QVBoxLayout *dice_game = new QVBoxLayout;
     QPushButton *dice_backtomenu = new QPushButton("Back to main menu", &window);
-    QLabel *dice_label = new QLabel("dice here", &window);
-    dice_game->addWidget(dice_label);
+    dice_menu *dice_widget = new dice_menu(window_width, &window);
+    dice_game->addWidget(dice_widget);
     dice_game->addWidget(dice_backtomenu);
 
+
+
     QObject::connect(dice_backtomenu, &QPushButton::clicked, [&]() {
+
         stackedWidget.setCurrentIndex(0);
     });
 
@@ -72,7 +83,6 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(new QWidget);
     stackedWidget.addWidget(new QWidget);
 
-
     stackedWidget.widget(0)->setLayout(main_menu);
     stackedWidget.widget(1)->setLayout(blackjack_game);
     stackedWidget.widget(2)->setLayout(dice_game);
@@ -85,9 +95,11 @@ int main(int argc, char *argv[]) {
     mainLayout->addWidget(&stackedWidget);
 
 
+
     window.setLayout(mainLayout);
 
     window.show();
+    window.resize(640, 480);
 
     return app.exec();
 }
