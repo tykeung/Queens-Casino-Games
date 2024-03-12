@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <cmath>
 
 using namespace std;
 
@@ -98,7 +99,7 @@ private:
 
 class MinesweeperGame {
 public:
-    MinesweeperGame() : rtp(0.99), houseEdge(0.01), boardSize(4), consecutiveWins(0), 
+    MinesweeperGame() : rtp(0.99), houseEdge(0.01), boardSize(5), consecutiveWins(0), 
     allTilesRevealed_(false) {}
 
     void resetBoard(Player& player) {
@@ -120,18 +121,18 @@ public:
 
     void startGame(Player& player, MinesweeperGame& game) {
         // Reset consecutive wins and multiplier
-        consecutiveWins = 0;
+        game.consecutiveWins = 0;
         multiplier = 1.0;
         resetBoard(player);
         int chosenMines;
 
     while (true) {
-        cout << "Enter the number of mines (1-15): ";
+        cout << "Enter the number of mines (1-24): ";
         cout.flush();
         cin >> chosenMines;
 
-        if (cin.fail() || chosenMines < 1 || chosenMines > 15) {
-            cout << "Invalid input. Please enter a number between 1 and 15." << endl;
+        if (cin.fail() || chosenMines < 1 || chosenMines > 24) {
+            cout << "Invalid input. Please enter a number between 1 and 24." << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         } else {
@@ -170,10 +171,11 @@ public:
 
 
 void revealTile(Tile& tile, Player& player) {
-     if (tile.getState() == Tile::REVEALED) {
-            cout << "This tile has already been revealed. Please choose another one." << endl;
-            return;
-        }
+    if (tile.getState() == Tile::REVEALED) {
+        cout << "This tile has already been revealed. Please choose another one." << endl;
+        return;
+    }
+
     tile.reveal();
     int newBalance;
 
@@ -181,16 +183,14 @@ void revealTile(Tile& tile, Player& player) {
         player.endRound();
         newBalance = player.getChipBalance() - player.getBetAmount();
         player.setChipBalance(newBalance);
+        consecutiveWins = 0; // Reset consecutiveWins when a mine is revealed
         cout << "Current Chip Balance: $" << player.getChipBalance() << endl;
     } else {
         // Calculate and update winnings
-        if(player.getWinnings() > player.getBetAmount()){
-            player.setWinnings(player.getWinnings() * multiplier);
-        }
-            else{
-                player.setWinnings(player.getBetAmount() * multiplier);
-            }
-        player.setTotalProfit(player.getWinnings());
+        consecutiveWins++;
+        double multiplier = calculateMultiplier(player.getNumMines());
+        int winnings = player.getBetAmount() * multiplier;
+        player.setTotalProfit(winnings);
 
         // Check if all tiles are revealed or the player chooses to end the round
         bool allTilesRevealed = checkAllTilesRevealed(player);
@@ -219,9 +219,7 @@ void revealTile(Tile& tile, Player& player) {
     }
 
     double calculateMultiplier(int numMines) const {
-        // Calculate multiplier based on the number of mines
-        // (Add your own logic for determining the multiplier)
-        return 1.0 + 0.1 * numMines;
+        return std::pow(1.05, numMines+consecutiveWins);
     }
 
     bool playAgain() {
@@ -285,6 +283,7 @@ int main() {
     player.setChipBalance(100);
 
     do {
+        MinesweeperGame game;
         // Start a new game
         game.startGame(player, game);
         
@@ -315,7 +314,7 @@ int main() {
             }
 
             if (player.isPlaying()) {
-                cout << "Total Winnings: $" << player.getTotalProfit() << endl;
+                cout << "Total Winnings: $" << player.getTotalProfit()-player.getBetAmount() << endl;
                 char endRoundChoice;
                 cout << "Do you want to continue this round? (Y/N): ";
                 cin >> endRoundChoice;
