@@ -1,7 +1,10 @@
 // To add
-// 1. tell player value of dealer's hand
-// 2. make dealers turn function in real time instead of skipping to final hand
-// 3. splitting
+// 1. Make hit function
+// 2. Make hand class
+// 3. Insurance
+// 4. Split
+
+
 
 #include <iostream>
 #include <vector>
@@ -42,6 +45,8 @@ struct Card
     Suit suit;
 };
 
+
+
 class Deck
 {
 private:
@@ -50,6 +55,11 @@ private:
 public:
     Deck()
     {
+        newDeck();
+        shuffle();
+    }
+
+    void newDeck() {
         for (int suit = CLUBS; suit <= SPADES; ++suit)
         {
             for (int rank = ACE; rank <= KING; ++rank)
@@ -62,14 +72,22 @@ public:
     void shuffle()
     {
         srand(static_cast<unsigned int>(time(0)));
-        random_shuffle(cards.begin(), cards.end()); // Wjy can't I use this
+        random_shuffle(cards.begin(), cards.end()); 
     }
 
     Card dealCard()
     {
-        Card card = cards.back();
+        if (cards.empty())
+        {
+            cout << "Deck is empty, get a new deck" << endl;
+            newDeck();
+            shuffle();
+        }
+        Card card = cards.back(); // combine these lines?
         cards.pop_back();
         return card;
+        
+
     }
 };
 
@@ -79,16 +97,16 @@ string getCardRank(Card card)
     switch (card.rank)
     {
     case ACE:
-        rank = "Ace";
+        rank = "A";
         break;
     case JACK:
-        rank = "Jack";
+        rank = "J";
         break;
     case QUEEN:
-        rank = "Queen";
+        rank = "Q";
         break;
     case KING:
-        rank = "King";
+        rank = "K";
         break;
     default:
         rank = to_string(card.rank);
@@ -103,7 +121,6 @@ int getCardValue(Card card)
     {
     case ACE:
         value = 11; // Initially consider Ace as 11
-        // Do I need to pass in the hand or the points?
         break;
     case JACK:
     case QUEEN:
@@ -116,10 +133,74 @@ int getCardValue(Card card)
     return value;
 }
 
+string getCardSuit(Card card)
+{
+    string suit = "";
+    switch (card.suit)
+    {
+    case CLUBS:
+        suit = "Clubs";
+        break;
+    case DIAMONDS:
+        suit = "Diamonds";
+        break;
+    case HEARTS:
+        suit = "Hearts";
+        break;
+    case SPADES:
+        suit = "Spades";
+        break;
+    }
+    return suit;
+}
+
+string getCardSuitIcon(Card card)
+{
+    string suit = "";
+    switch (card.suit)
+    {
+    case CLUBS:
+        suit = "♣️";
+        break;
+    case DIAMONDS:
+        suit = "♦️";
+        break;
+    case HEARTS:
+        suit = "♥️";
+        break;
+    case SPADES:
+        suit = "♠️";
+        break;
+    }
+    return suit;
+}
+
+
+
 // int getCardName(Card card)
 // {
-//     return card.value + " of "+card.suit;
+//     return card.rank + " of "+card.suit;
 // }
+
+// Card hitPlayer(Deck deck, Card playerHand, int playerTotal, int bet, int balance, bool playerBusted)
+// {
+//     // Add a card to the hand
+//     // return the new hand
+
+//     Card newCard = deck.dealCard();
+//     playerHand.push_back(newCard);
+//     playerTotal = calculatePoints(playerHand);
+//     cout << "You drew a " << getCardRank(newCard) << endl;
+//     if (playerTotal > 21)
+//     {
+//         cout << "Busted! You lose." << endl;
+//         balance -= bet;
+//         playerBusted = true;
+//         break;
+//     }
+// }
+
+
 
 int calculatePoints(vector<Card> hand)
 {
@@ -171,12 +252,17 @@ int main()
         vector<Card> playerHand;
         vector<Card> dealerHand;
 
+        //Replace with deal functions
+
         // Deal cards from deck into hands
         playerHand.push_back(deck.dealCard());
+
         Card dealerFaceUp = deck.dealCard();
         dealerHand.push_back(dealerFaceUp);
+
         playerHand.push_back(deck.dealCard());
-        dealerHand.push_back(deck.dealCard());
+        Card dealerFaceDown = deck.dealCard();
+        dealerHand.push_back(dealerFaceDown);
 
         playerTotal = calculatePoints(playerHand);
         dealerTotal = calculatePoints(dealerHand);
@@ -195,11 +281,13 @@ int main()
 
             cout << endl
                  << "Your hands' value: " << playerTotal << endl;
-            cout << "Hit or stand? (h/s): ";
+            cout << "Hit, stand, or double? (h/s/d): ";
             cin >> choice;
 
             if (choice == 'h')
             {
+
+                //REPLACE WITH HIT FUNCTION
                 Card newCard = deck.dealCard();
                 playerHand.push_back(newCard);
                 playerTotal = calculatePoints(playerHand);
@@ -216,28 +304,63 @@ int main()
             {
                 break;
             }
+            else if(choice == 'd')
+            {
+                // double the bet
+                bet *= 2;
+
+                //Hit once
+                Card newCard = deck.dealCard();
+                playerHand.push_back(newCard);
+                playerTotal = calculatePoints(playerHand);
+                cout << "You drew a " << getCardRank(newCard) << endl;
+                if (playerTotal > 21)
+                {
+                    cout << "Busted! You lose." << endl;
+                    balance -= bet;
+                    playerBusted = true;
+                    break;
+                }
+
+                //Stop from hitting again
+                break;
+            }
             else
             {
                 cout << "Invalid choice! Please enter 'h' for hit or 's' for stand." << endl;
             }
         }
 
-        // loop for Dealer's turn
+        // Dealer's turn
         if (!playerBusted) {
             while (true) {
+
+                cout << "Dealer's hand: ";
+                for (const auto& card : dealerHand) {
+                    cout << getCardRank(card) << " ";
+                }
+                cout << endl;
 
                 dealerTotal = calculatePoints(dealerHand);
                 if (dealerTotal >= 17) {
                     break;
                 }
-                dealerHand.push_back(deck.dealCard());
+                Card newCard = deck.dealCard();
+                dealerHand.push_back(newCard);
+                cout << "Dealer hit and drew a " << getCardRank(newCard) << endl;
             }
 
-            cout << "Dealer's hand: ";
+            if (dealerTotal < 21 ) {
+                cout << "Dealer stands" << endl;
+            }
+
+            
+            cout << "Dealer's final hand: ";
             for (const auto& card : dealerHand) {
-                cout << getCardValue(card) << " ";
+                cout << getCardRank(card) << "" << getCardSuitIcon(card) << " ";
             }
             cout << endl;
+            cout << "Dealer's hands' value: " << dealerTotal << endl;
 
             if (dealerTotal > 21 ) {
                 cout << "The dealer busted! You win!" << endl;
