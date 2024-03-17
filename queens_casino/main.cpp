@@ -26,13 +26,13 @@ int main(int argc, char *argv[]) {
     QLineEdit *balance_display = new QLineEdit();
     balance_display->setText(QString::number(balance, 'f', 2));
     balance_display->setReadOnly(true);
-    balance_display->setFixedSize(50, balance_display->sizeHint().height());
+    balance_display->setFixedSize(100, balance_display->sizeHint().height());
     balance_display->setAlignment(Qt::AlignRight);
 
 
 
 
-    label1->setAlignment(Qt::AlignCenter); // Center align the label
+    label1->setAlignment(Qt::AlignCenter);
     label1->setStyleSheet("font-size: 36pt");
     main_menu->addWidget(balance_display);
     main_menu->addWidget(label1);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     QVBoxLayout *blackjack_game = new QVBoxLayout;
     QPushButton *blackjack_backtomenu = new QPushButton("Back to main menu", &window);
-    blackjack_menu *blackjack_widget = new blackjack_menu(&window);
+    blackjack_menu *blackjack_widget = new blackjack_menu(window_width, balance, &window);
     blackjack_game->addWidget(blackjack_widget);
     blackjack_game->addWidget(blackjack_backtomenu);
 
@@ -76,10 +76,15 @@ int main(int argc, char *argv[]) {
         balance += val;
         balance_display->setText(QString::number(balance, 'f', 2));
         dice_widget->emit balance_updated(balance);
+        blackjack_widget->emit balance_updated(balance);
 
     };
 
     QObject::connect(dice_widget, &dice_menu::roll_clicked, [&](float val) {
+        update_balance(val);
+    });
+
+    QObject::connect(blackjack_widget, &blackjack_menu::roll_clicked, [&](float val) {
         update_balance(val);
     });
 

@@ -22,4 +22,4 @@ signals:
 };
 
 
-#endif // BLACKJACK_MENU_H
+#endif
