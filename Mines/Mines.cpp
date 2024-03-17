@@ -68,18 +68,20 @@ private:
 
 class Player {
 public:
-    Player() : betAmount(0), numMines(0), totalProfit(0), chipBalance(0), playing(true) {}
+    Player() : betAmount(0), numMines(0), totalProfit(0), chipBalance(0), playing(true), totalWon(0) {}
 
     void setBetAmount(int amount) { betAmount = amount; }
     void setNumMines(int mines) { numMines = mines; }
     void setTotalProfit(int profit) { totalProfit = profit; }
     void setPlaying(bool status) { playing = status; }
     void setChipBalance(int balance) { chipBalance = balance; }
+    void setWinnings(int winnings) {totalWon = winnings;}
 
     int getBetAmount() const { return betAmount; }
     int getNumMines() const { return numMines; }
     int getTotalProfit() const { return totalProfit; }
     int getChipBalance() const { return chipBalance; }
+    int getWinnings() const { return totalWon; }
 
     bool isPlaying() const { return playing; }
     void endRound() { playing = false; }
@@ -91,6 +93,7 @@ private:
     bool playing;
     int chipBalance;
     int id;
+    int totalWon;
 };
 
 class MinesweeperGame {
@@ -181,8 +184,13 @@ void revealTile(Tile& tile, Player& player) {
         cout << "Current Chip Balance: $" << player.getChipBalance() << endl;
     } else {
         // Calculate and update winnings
-        int winnings = player.getBetAmount() * multiplier;
-        player.setTotalProfit(player.getTotalProfit() + winnings);
+        if(player.getWinnings() > player.getBetAmount()){
+            player.setWinnings(player.getWinnings() * multiplier);
+        }
+            else{
+                player.setWinnings(player.getBetAmount() * multiplier);
+            }
+        player.setTotalProfit(player.getWinnings());
 
         // Check if all tiles are revealed or the player chooses to end the round
         bool allTilesRevealed = checkAllTilesRevealed(player);
@@ -311,6 +319,10 @@ int main() {
                 char endRoundChoice;
                 cout << "Do you want to continue this round? (Y/N): ";
                 cin >> endRoundChoice;
+                while (endRoundChoice != 'Y' && endRoundChoice != 'y' && endRoundChoice != 'N' && endRoundChoice != 'n') {
+                cout << "Invalid input. Please enter 'Y' or 'N': ";
+                cin >> endRoundChoice;
+        }
                 if (tolower(endRoundChoice) == 'n') {
                     // Add total winnings to chip balance if the round ends
                     player.setChipBalance(player.getChipBalance() + player.getTotalProfit() - player.getBetAmount());

@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QSlider>
@@ -9,6 +10,8 @@
 #include <QTimer>
 #include <QStyleOptionSlider>
 #include <QStylePainter>
+#include <QLineEdit>
+#include <QMessageBox>
 
 class CustomSlider : public QSlider {
 public:
@@ -54,7 +57,7 @@ private:
     QLabel *roll_display;
 };
 
-dice_menu::dice_menu(int window_width, QWidget *parent) : QWidget(parent) {
+dice_menu::dice_menu(int window_width, float &balance, QWidget *parent) : QWidget(parent) {
     QVBoxLayout *layout = new QVBoxLayout(this);
     QLabel *win_label = new QLabel("Win chance 50.0%, to win 1.980x");
     CustomSlider *invisible_slider = new CustomSlider(this, this);
@@ -66,14 +69,31 @@ dice_menu::dice_menu(int window_width, QWidget *parent) : QWidget(parent) {
     slider->setRange(0, 1000);
     slider->setValue(500);
 
+    QLineEdit *balance_display = new QLineEdit();
+    balance_display->setText(QString::number(balance));
+    balance_display->setReadOnly(true);
+    balance_display->setFixedSize(50, balance_display->sizeHint().height());
+    balance_display->setAlignment(Qt::AlignRight);
+
+    QLabel *bet_word = new QLabel("Bet");
+    QLineEdit *bet = new QLineEdit();
+    QHBoxLayout *bet_line = new QHBoxLayout();
+    QWidget *bet_line_widget = new QWidget();
+    bet_line->addWidget(bet_word);
+    bet_line->addWidget(bet);
+    bet_line_widget->setLayout(bet_line);
+
+
+
 
     QPushButton *roll_button = new QPushButton("Roll");
+    layout->addWidget(balance_display);
     layout->addWidget(invisible_slider->getTextDisplayLabel());
     layout->addWidget(invisible_slider);
     layout->addWidget(slider);
     layout->addWidget(win_label);
     layout->addWidget(roll_button);
-    layout->setAlignment(Qt::AlignCenter);
+    layout->addWidget(bet_line_widget);
     setLayout(layout);
 
     QObject::connect(invisible_slider, &QSlider::valueChanged, [invisible_slider](int value) {
@@ -90,13 +110,38 @@ dice_menu::dice_menu(int window_width, QWidget *parent) : QWidget(parent) {
         }
 
         double reciprocal = (1.0 / (static_cast<double>(value) / 1000)) * 0.990;
-        QString dice_multiplier = QString::number(reciprocal, 'f', 3);
-        win_label->setText("Win chance " + QString::number(value / 10.0, 'f', 1) + "%, to win " + dice_multiplier + "x");
+        win_label->setText("Win chance " + QString::number(value / 10.0, 'f', 1) + "%, to win " + QString::number(reciprocal, 'f', 3) + "x");
     });
 
-    QObject::connect(roll_button, &QPushButton::clicked, [invisible_slider]() {
-        int random_number = (rand() % 1000) + 1;
-        invisible_slider->setValue(random_number);
-        invisible_slider->getTextDisplayLabel()->setText(QString::number(random_number));
+    QObject::connect(roll_button, &QPushButton::clicked, [bet, invisible_slider, slider, this]() {
+        bool ok;
+        QString text = bet->text();
+        float bet_value = text.toFloat(&ok);
+
+        if (ok) {
+
+            int random_number = (rand() % 1000) + 1;
+            invisible_slider->setValue(random_number);
+            invisible_slider->getTextDisplayLabel()->setText(QString::number(random_number));
+            if (slider->value() > random_number) {
+                float win = bet_value * 0.990 * ((1.0 / (static_cast<float>(slider->value()) / 1000.00))-1);
+                qDebug() << win;
+
+                emit roll_clicked(win);
+                //emit roll_clicked(500);
+            } else {
+                emit roll_clicked(-1 * bet_value);
+            }
+        } else {
+            QMessageBox::critical(nullptr, "Error", "Invalid input! Please enter a valid number.");
+            bet->clear();
+        }
+
+
     });
+
+    QObject::connect(this, &dice_menu::balance_updated, [balance_display](float balance_change) {
+        balance_display->setText(QString::number(balance_change, 'f', 2));
+    });
+
 }
