@@ -144,7 +144,7 @@ dice_menu::dice_menu(int window_width, float &balance, QWidget *parent) : QWidge
     });
 
     QObject::connect(this, &dice_menu::balance_updated, [balance_display](float balance_change) {
-        balance_display->setText(QString::number(balance_change, 'f', 0));
+        balance_display->setText(QString::number(balance_change, 'f', 2));
     });
 
 

@@ -101,7 +101,7 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
                 if(finished){
                     float total_win = (bet->text().toFloat() * (pow(1.05, mine->text().toInt() + count)));
                     mines_menu::roll_clicked(total_win - bet->text().toFloat());
-                    game_result->setText("You have cleared the board and won " + QString::number(total_win) + " chips");
+                    game_result->setText("You have cleared the board and won " + QString::number(total_win - bet->text().toFloat()) + " chips");
                     end_game->setEnabled(false);
                     start_game->setEnabled(true);
                     mine->setEnabled(true);
@@ -169,9 +169,9 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
     });
 
     QObject::connect(end_game, &QPushButton::clicked, [start_game, bet, btn, end_game, mine, game_result, this] () {
-        float total_win = bet->text().toFloat() * (pow(1.10, mine->text().toInt() + count));
+        float total_win = bet->text().toFloat() * (pow(1.05, mine->text().toInt() + count));
         mines_menu::roll_clicked(total_win - bet->text().toFloat());
-        game_result->setText("You have cashed out early with " + QString::number(total_win));
+        game_result->setText("You have cashed out early with " + QString::number(total_win - bet->text().toFloat()));
         end_game->setEnabled(false);
         start_game->setEnabled(true);
         mine->setEnabled(true);
@@ -184,7 +184,7 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
     });
 
     QObject::connect(this, &mines_menu::balance_updated, [balance_display](float balance_change) {
-        balance_display->setText(QString::number(balance_change, 'f', 0));
+        balance_display->setText(QString::number(balance_change, 'f', 2));
     });
 }
 

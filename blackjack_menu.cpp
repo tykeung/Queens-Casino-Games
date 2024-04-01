@@ -92,7 +92,7 @@ blackjack_menu::blackjack_menu(int window_width, float &balance, QWidget *parent
 
 
     QObject::connect(this, &blackjack_menu::balance_updated, [balance_display](float balance_change) {
-        balance_display->setText(QString::number(balance_change, 'f', 0));
+        balance_display->setText(QString::number(balance_change, 'f', 2));
     });
 
     QObject::connect(start_game, &QPushButton::clicked, [double_down, game_result, bet, deck, playerHand, dealerHand, start_game, hit, stand, dealer_hand, player_hand, this] () {
