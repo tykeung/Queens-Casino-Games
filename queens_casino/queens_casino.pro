@@ -12,12 +12,14 @@ SOURCES += \
     blackjack_menu.cpp \
     dice_menu.cpp \
     main.cpp \
+    mines_menu.cpp \
     widget.cpp
 
 HEADERS += \
     blackjack_menu.h \
     dice_menu.h \
     main.h \
+    mines_menu.h \
     widget.h
 
 FORMS += \

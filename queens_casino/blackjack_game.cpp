@@ -224,184 +224,184 @@ int calculatePoints(vector<Card> *hand)
     return total;
 }
 
-int main()
-{
-    /*
-    int balance = 1000; // starting balance
-    int bet;
-    char choice;
-    Deck deck;
-    deck.shuffle();
-    bool playerBusted = false;
-    bool dealerBusted = false;
-    int playerTotal = 0;
-    int dealerTotal = 0;
+// int main()
+// {
+//     /*
+//     int balance = 1000; // starting balance
+//     int bet;
+//     char choice;
+//     Deck deck;
+//     deck.shuffle();
+//     bool playerBusted = false;
+//     bool dealerBusted = false;
+//     int playerTotal = 0;
+//     int dealerTotal = 0;
 
-    while (balance > 0)
-    {
-        cout << "Your balance: $" << balance << endl;
-        cout << "Place your bet: ";
-        cin >> bet;
+//     while (balance > 0)
+//     {
+//         cout << "Your balance: $" << balance << endl;
+//         cout << "Place your bet: ";
+//         cin >> bet;
 
-        if (bet > balance)
-        {
-            cout << "You don't have enough balance to place this bet!" << endl;
-            continue;
-        }
+//         if (bet > balance)
+//         {
+//             cout << "You don't have enough balance to place this bet!" << endl;
+//             continue;
+//         }
 
-        // Initiliaze hands
-        vector<Card> playerHand;
-        vector<Card> dealerHand;
+//         // Initiliaze hands
+//         vector<Card> playerHand;
+//         vector<Card> dealerHand;
 
-        //Replace with deal functions
+//         //Replace with deal functions
 
-        // Deal cards from deck into hands
-        playerHand.push_back(deck.dealCard());
+//         // Deal cards from deck into hands
+//         playerHand.push_back(deck.dealCard());
 
-        Card dealerFaceUp = deck.dealCard();
-        dealerHand.push_back(dealerFaceUp);
+//         Card dealerFaceUp = deck.dealCard();
+//         dealerHand.push_back(dealerFaceUp);
 
-        playerHand.push_back(deck.dealCard());
-        Card dealerFaceDown = deck.dealCard();
-        dealerHand.push_back(dealerFaceDown);
+//         playerHand.push_back(deck.dealCard());
+//         Card dealerFaceDown = deck.dealCard();
+//         dealerHand.push_back(dealerFaceDown);
 
-        playerTotal = calculatePoints(playerHand);
-        dealerTotal = calculatePoints(dealerHand);
+//         playerTotal = calculatePoints(playerHand);
+//         dealerTotal = calculatePoints(dealerHand);
 
-        cout << "Dealer's face up card: " << getCardRank(dealerFaceUp) << endl;        
+//         cout << "Dealer's face up card: " << getCardRank(dealerFaceUp) << endl;
 
-        // loop for Player's turn
-        while (true)
-        {
-            cout << "Your hand: ";
-            for (Card card : playerHand)
-            {
-                //cout << getCardRank(card) << "(" << getCardValue(card) << ") ";
-                cout << getCardRank(card)  << " ";
-            }
+//         // loop for Player's turn
+//         while (true)
+//         {
+//             cout << "Your hand: ";
+//             for (Card card : playerHand)
+//             {
+//                 //cout << getCardRank(card) << "(" << getCardValue(card) << ") ";
+//                 cout << getCardRank(card)  << " ";
+//             }
 
-            cout << endl
-                 << "Your hands' value: " << playerTotal << endl;
-            cout << "Hit, stand, or double? (h/s/d): ";
-            cin >> choice;
+//             cout << endl
+//                  << "Your hands' value: " << playerTotal << endl;
+//             cout << "Hit, stand, or double? (h/s/d): ";
+//             cin >> choice;
 
-            if (choice == 'h')
-            {
+//             if (choice == 'h')
+//             {
 
-                //REPLACE WITH HIT FUNCTION
-                Card newCard = deck.dealCard();
-                playerHand.push_back(newCard);
-                playerTotal = calculatePoints(playerHand);
-                cout << "You drew a " << getCardRank(newCard) << endl;
-                if (playerTotal > 21)
-                {
-                    cout << "Busted! You lose." << endl;
-                    balance -= bet;
-                    playerBusted = true;
-                    break;
-                }
-            }
-            else if (choice == 's')
-            {
-                break;
-            }
-            else if(choice == 'd')
-            {
-                // double the bet
-                bet *= 2;
+//                 //REPLACE WITH HIT FUNCTION
+//                 Card newCard = deck.dealCard();
+//                 playerHand.push_back(newCard);
+//                 playerTotal = calculatePoints(playerHand);
+//                 cout << "You drew a " << getCardRank(newCard) << endl;
+//                 if (playerTotal > 21)
+//                 {
+//                     cout << "Busted! You lose." << endl;
+//                     balance -= bet;
+//                     playerBusted = true;
+//                     break;
+//                 }
+//             }
+//             else if (choice == 's')
+//             {
+//                 break;
+//             }
+//             else if(choice == 'd')
+//             {
+//                 // double the bet
+//                 bet *= 2;
 
-                //Hit once
-                Card newCard = deck.dealCard();
-                playerHand.push_back(newCard);
-                playerTotal = calculatePoints(playerHand);
-                cout << "You drew a " << getCardRank(newCard) << endl;
-                if (playerTotal > 21)
-                {
-                    cout << "Busted! You lose." << endl;
-                    balance -= bet;
-                    playerBusted = true;
-                    break;
-                }
+//                 //Hit once
+//                 Card newCard = deck.dealCard();
+//                 playerHand.push_back(newCard);
+//                 playerTotal = calculatePoints(playerHand);
+//                 cout << "You drew a " << getCardRank(newCard) << endl;
+//                 if (playerTotal > 21)
+//                 {
+//                     cout << "Busted! You lose." << endl;
+//                     balance -= bet;
+//                     playerBusted = true;
+//                     break;
+//                 }
 
-                //Stop from hitting again
-                break;
-            }
-            else
-            {
-                cout << "Invalid choice! Please enter 'h' for hit or 's' for stand." << endl;
-            }
-        }
+//                 //Stop from hitting again
+//                 break;
+//             }
+//             else
+//             {
+//                 cout << "Invalid choice! Please enter 'h' for hit or 's' for stand." << endl;
+//             }
+//         }
 
-        // Dealer's turn
-        if (!playerBusted) {
-            while (true) {
+//         // Dealer's turn
+//         if (!playerBusted) {
+//             while (true) {
 
-                cout << "Dealer's hand: ";
-                for (const auto& card : dealerHand) {
-                    cout << getCardRank(card) << " ";
-                }
-                cout << endl;
+//                 cout << "Dealer's hand: ";
+//                 for (const auto& card : dealerHand) {
+//                     cout << getCardRank(card) << " ";
+//                 }
+//                 cout << endl;
 
-                dealerTotal = calculatePoints(dealerHand);
-                if (dealerTotal >= 17) {
-                    break;
-                }
-                Card newCard = deck.dealCard();
-                dealerHand.push_back(newCard);
-                cout << "Dealer hit and drew a " << getCardRank(newCard) << endl;
-            }
+//                 dealerTotal = calculatePoints(dealerHand);
+//                 if (dealerTotal >= 17) {
+//                     break;
+//                 }
+//                 Card newCard = deck.dealCard();
+//                 dealerHand.push_back(newCard);
+//                 cout << "Dealer hit and drew a " << getCardRank(newCard) << endl;
+//             }
 
-            if (dealerTotal < 21 ) {
-                cout << "Dealer stands" << endl;
-            }
+//             if (dealerTotal < 21 ) {
+//                 cout << "Dealer stands" << endl;
+//             }
 
             
-            cout << "Dealer's final hand: ";
-            for (const auto& card : dealerHand) {
-                cout << getCardRank(card) << "" << getCardSuitIcon(card) << " ";
-            }
-            cout << endl;
-            cout << "Dealer's hands' value: " << dealerTotal << endl;
+//             cout << "Dealer's final hand: ";
+//             for (const auto& card : dealerHand) {
+//                 cout << getCardRank(card) << "" << getCardSuitIcon(card) << " ";
+//             }
+//             cout << endl;
+//             cout << "Dealer's hands' value: " << dealerTotal << endl;
 
-            if (dealerTotal > 21 ) {
-                cout << "The dealer busted! You win!" << endl;
-                balance += bet;
-            }else if(playerTotal > dealerTotal) {
-                cout << "You win!" << endl;
-                balance += bet;
-            }
-             else if (dealerTotal > playerTotal) {
-                cout << "Dealer wins!" << endl;
-                balance -= bet;
-            } else {
-                cout << "It's a tie! The dealer wins..." << endl;
-                balance -= bet;
-            }
-        }
+//             if (dealerTotal > 21 ) {
+//                 cout << "The dealer busted! You win!" << endl;
+//                 balance += bet;
+//             }else if(playerTotal > dealerTotal) {
+//                 cout << "You win!" << endl;
+//                 balance += bet;
+//             }
+//              else if (dealerTotal > playerTotal) {
+//                 cout << "Dealer wins!" << endl;
+//                 balance -= bet;
+//             } else {
+//                 cout << "It's a tie! The dealer wins..." << endl;
+//                 balance -= bet;
+//             }
+//         }
 
-        cout << "Your balance: $" << balance << endl;
+//         cout << "Your balance: $" << balance << endl;
 
-        if (balance > 0)
-        {
-            cout << "Do you want to play again? (y/n): ";
-            cin >> choice;
+//         if (balance > 0)
+//         {
+//             cout << "Do you want to play again? (y/n): ";
+//             cin >> choice;
 
-            if (choice != 'y')
-            {
-                break;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
+//             if (choice != 'y')
+//             {
+//                 break;
+//             }
+//         }
+//         else
+//         {
+//             break;
+//         }
+//     }
 
-    if (balance <= 0)
-    {
-        cout << "You are out of money! ";
-    }
-    cout << "Your final balance: $" << balance << endl;
-    return 0;
-       */
-}
+//     if (balance <= 0)
+//     {
+//         cout << "You are out of money! ";
+//     }
+//     cout << "Your final balance: $" << balance << endl;
+//     return 0;
+//        */
+// }

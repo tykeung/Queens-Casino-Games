@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include "blackjack_menu.h"
 #include "dice_menu.h"
+#include "mines_menu.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -48,19 +49,17 @@ int main(int argc, char *argv[]) {
         stackedWidget.setCurrentIndex(2);
     });
 
-    int window_width = window.sizeHint().width();
-
     QObject::connect(mines_game_button, &QPushButton::clicked, [&]() {
         stackedWidget.setCurrentIndex(3);
     });
 
+    int window_width = window.sizeHint().width();
 
     QVBoxLayout *blackjack_game = new QVBoxLayout;
     QPushButton *blackjack_backtomenu = new QPushButton("Back to main menu", &window);
     blackjack_menu *blackjack_widget = new blackjack_menu(window_width, balance, &window);
     blackjack_game->addWidget(blackjack_widget);
     blackjack_game->addWidget(blackjack_backtomenu);
-
 
     QObject::connect(blackjack_backtomenu, &QPushButton::clicked, [&]() {
         stackedWidget.setCurrentIndex(0);
@@ -72,12 +71,26 @@ int main(int argc, char *argv[]) {
     dice_game->addWidget(dice_widget);
     dice_game->addWidget(dice_backtomenu);
 
+    QObject::connect(dice_backtomenu, &QPushButton::clicked, [&]() {
+        stackedWidget.setCurrentIndex(0);
+    });
+
+    QVBoxLayout *mines_game = new QVBoxLayout;
+    QPushButton *mines_backtomenu = new QPushButton("Back to main menu", &window);
+    mines_menu *mines_widget = new mines_menu(window_width, balance, &window);
+    mines_game->addWidget(mines_widget);
+    mines_game->addWidget(mines_backtomenu);
+
+    QObject::connect(mines_backtomenu, &QPushButton::clicked, [&]() {
+        stackedWidget.setCurrentIndex(0);
+    });
+
     auto update_balance = [&](float val) {
         balance += val;
         balance_display->setText(QString::number(balance, 'f', 2));
         dice_widget->emit balance_updated(balance);
         blackjack_widget->emit balance_updated(balance);
-
+        mines_widget->emit balance_updated(balance);
     };
 
     QObject::connect(dice_widget, &dice_menu::roll_clicked, [&](float val) {
@@ -88,25 +101,9 @@ int main(int argc, char *argv[]) {
         update_balance(val);
     });
 
-
-
-
-    QObject::connect(dice_backtomenu, &QPushButton::clicked, [&]() {
-
-        stackedWidget.setCurrentIndex(0);
+    QObject::connect(mines_widget, &mines_menu::roll_clicked, [&](float val) {
+        update_balance(val);
     });
-
-    QVBoxLayout *mines_game = new QVBoxLayout;
-    QPushButton *mines_backtomenu = new QPushButton("Back to main menu", &window);
-    QLabel *mines_label = new QLabel("mines here", &window);
-    mines_game->addWidget(mines_label);
-    mines_game->addWidget(mines_backtomenu);
-
-    QObject::connect(mines_backtomenu, &QPushButton::clicked, [&]() {
-        stackedWidget.setCurrentIndex(0);
-    });
-
-
 
 
     stackedWidget.addWidget(new QWidget);
@@ -125,8 +122,6 @@ int main(int argc, char *argv[]) {
 
     mainLayout->addWidget(&stackedWidget);
 
-
-
     window.setLayout(mainLayout);
 
     window.show();
@@ -134,4 +129,3 @@ int main(int argc, char *argv[]) {
 
     return app.exec();
 }
-

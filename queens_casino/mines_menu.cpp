@@ -15,8 +15,11 @@
 
 bool minefield[5][5];
 int count;
+int num_mines;
+float multiplier;
 
 mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWidget(parent) {
+
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QLineEdit *balance_display = new QLineEdit();
@@ -60,7 +63,7 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
     for(int i = 0; i < 5; i++) {
         for(int j = 0; j < 5; j++){
             btn[i][j] = new QPushButton();
-            btn[i][j]->setText(QString::number(i) + " - " + QString::number(j));
+            //btn[i][j]->setText(QString::number(i) + " - " + QString::number(j));
             btn[i][j]->setFixedSize(btnSize);
             btn[i][j]->setEnabled(false);
         }
@@ -79,14 +82,26 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
                     bet->setEnabled(true);
                     for(int x = 0; x < 5; x++) {
                         for(int y = 0; y < 5; y++){
+                            if (btn[x][y]->isEnabled()) {
+                                if (minefield[x][y]) {
+                                    btn[x][y]->setStyleSheet("background-color: #FF7F7F;");
+                                } else {
+                                    btn[x][y]->setStyleSheet("background-color: #D1FFBD;");
+                                }
+                            }
                             btn[x][y]->setEnabled(false);
                         }
                     }
+                    btn[i][j]->setStyleSheet("background-color: #400000;");
                 } else {
                     minefield[i][j] = true;
                     btn[i][j]->setEnabled(false);
+                    multiplier = multiplier * (1/(static_cast<float>(25-num_mines-count)/static_cast<float>(25-count)));
                     count++;
-                    game_result->setText("You have cleared " +  QString::number(count) + " tiles and have a multiplier of " + QString::number(pow(1.05, mine->text().toInt() + count)) + "x");
+                    game_result->setText("sYou have cleared " + QString::number(count) + " tiles and have a multiplier of " + QString::number(multiplier*0.99, 'f', 2) + "x");
+                    //game_result->setText("You have cleared " +  QString::number(count) + " tiles and have a multiplier of " + multiplier + "x");
+                    end_game->setEnabled(true);
+                    btn[i][j]->setStyleSheet("background-color: #00FF00;");
                 }
 
                 bool finished = true;
@@ -99,8 +114,8 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
                 }
 
                 if(finished){
-                    float total_win = (bet->text().toFloat() * (pow(1.05, mine->text().toInt() + count)));
-                    mines_menu::roll_clicked(total_win - bet->text().toFloat());
+                    float total_win = bet->text().toFloat() * multiplier*0.99 - bet->text().toFloat();
+                    mines_menu::roll_clicked(total_win);
                     game_result->setText("You have cleared the board and won " + QString::number(total_win - bet->text().toFloat()) + " chips");
                     end_game->setEnabled(false);
                     start_game->setEnabled(true);
@@ -108,6 +123,13 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
                     bet->setEnabled(true);
                     for(int x = 0; x < 5; x++) {
                         for(int y = 0; y < 5; y++){
+                            if (btn[x][y]->isEnabled()) {
+                                if (minefield[x][y]) {
+                                    btn[x][y]->setStyleSheet("background-color: #FF7F7F;");
+                                } else {
+                                    btn[x][y]->setStyleSheet("background-color: #D1FFBD;");
+                                }
+                            }
                             btn[x][y]->setEnabled(false);
                         }
                     }
@@ -131,6 +153,9 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
 
     QObject::connect(start_game, &QPushButton::clicked, [start_game, bet, btn, end_game, mine, game_result] () {
         bool okbet, okmines;
+        num_mines = mine->text().toInt();
+        multiplier = 1.00;
+        count = 0;
         QString textb = bet->text();
         textb.toFloat(&okbet);
         QString textm = mine->text();
@@ -138,16 +163,17 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
 
         if (okbet && okmines && textm.toInt() < 25 && textm.toInt() > 0) {
             start_game->setEnabled(false);
-            end_game->setEnabled(true);
+            end_game->setEnabled(false);
             mine->setEnabled(false);
             bet->setEnabled(false);
-            count = 0;
+
             game_result->setText("Pick any tile you want");
             //makes board and enables buttons
             for(int i = 0; i < 5; i++) {
                 for(int j = 0; j < 5; j++) {
                     minefield[i][j] = false;
                     btn[i][j]->setEnabled(true);
+                    btn[i][j]->setStyleSheet(""); // blank
                 }
             }
             //sets board mine placement
@@ -169,15 +195,22 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
     });
 
     QObject::connect(end_game, &QPushButton::clicked, [start_game, bet, btn, end_game, mine, game_result, this] () {
-        float total_win = bet->text().toFloat() * (pow(1.05, mine->text().toInt() + count));
-        mines_menu::roll_clicked(total_win - bet->text().toFloat());
-        game_result->setText("You have cashed out early with " + QString::number(total_win - bet->text().toFloat()));
+        float total_win = bet->text().toFloat() * multiplier*0.99 - bet->text().toFloat();
+        mines_menu::roll_clicked(total_win);
+        game_result->setText("You have cashed out early with " + QString::number(total_win));
         end_game->setEnabled(false);
         start_game->setEnabled(true);
         mine->setEnabled(true);
         bet->setEnabled(true);
         for(int i = 0; i < 5; i++) {
             for(int j = 0; j < 5; j++){
+                if (btn[i][j]->isEnabled()) {
+                    if (minefield[i][j]) {
+                        btn[i][j]->setStyleSheet("background-color: #FF7F7F;");
+                    } else {
+                        btn[i][j]->setStyleSheet("background-color: #D1FFBD;");
+                    }
+                }
                 btn[i][j]->setEnabled(false);
             }
         }
