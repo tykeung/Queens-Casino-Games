@@ -6,12 +6,16 @@
 #include <QSlider>
 #include <QStackedWidget>
 #include <QLineEdit>
+#include <QMovie>
+
 #include "blackjack_menu.h"
 #include "dice_menu.h"
 #include "mines_menu.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    //app.setStyleSheet("QWidget { background-color: #8B0000; color: white; }");
+
 
     QWidget window;
     window.setWindowTitle("Queen's Casino Games");
@@ -104,6 +108,25 @@ int main(int argc, char *argv[]) {
     QObject::connect(mines_widget, &mines_menu::roll_clicked, [&](float val) {
         update_balance(val);
     });
+
+    /*
+    QLabel *gifLabel1 = new QLabel(&window);
+    QMovie *movie1 = new QMovie("manji.gif");
+    gifLabel1->setMovie(movie1);
+    movie1->start();
+
+    QLabel *gifLabel2 = new QLabel(&window);
+    QMovie *movie2 = new QMovie("tomdean.gif");
+    gifLabel2->setMovie(movie2);
+    movie2->start();
+
+    // Add the gif labels to the layout
+    main_menu->addWidget(gifLabel1);
+    main_menu->addWidget(gifLabel2);
+
+    qDebug() << "GIF 1 movie started:" << movie1->isValid();
+    qDebug() << "GIF 2 movie started:" << movie2->isValid();
+    */
 
 
     stackedWidget.addWidget(new QWidget);

@@ -91,22 +91,24 @@ public:
     }
 };
 
+
+
 string getCardRank(Card card)
 {
     string rank = "";
     switch (card.rank)
     {
     case ACE:
-        rank = "A";
+        rank = "ace";
         break;
     case JACK:
-        rank = "J";
+        rank = "jack";
         break;
     case QUEEN:
-        rank = "Q";
+        rank = "queen";
         break;
     case KING:
-        rank = "K";
+        rank = "king";
         break;
     default:
         rank = to_string(card.rank);
@@ -139,16 +141,16 @@ string getCardSuit(Card card)
     switch (card.suit)
     {
     case CLUBS:
-        suit = "Clubs";
+        suit = "clubs";
         break;
     case DIAMONDS:
-        suit = "Diamonds";
+        suit = "diamonds";
         break;
     case HEARTS:
-        suit = "Hearts";
+        suit = "hearts";
         break;
     case SPADES:
-        suit = "Spades";
+        suit = "spades";
         break;
     }
     return suit;
@@ -173,6 +175,10 @@ string getCardSuitIcon(Card card)
         break;
     }
     return suit;
+}
+
+string getCardFile(Card card) {
+    return getCardRank(card) + "_of_" + getCardSuit(card) + ".png";
 }
 
 

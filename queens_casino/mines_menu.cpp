@@ -98,7 +98,7 @@ mines_menu::mines_menu(int window_width, float &balance, QWidget *parent) : QWid
                     btn[i][j]->setEnabled(false);
                     multiplier = multiplier * (1/(static_cast<float>(25-num_mines-count)/static_cast<float>(25-count)));
                     count++;
-                    game_result->setText("sYou have cleared " + QString::number(count) + " tiles and have a multiplier of " + QString::number(multiplier*0.99, 'f', 2) + "x");
+                    game_result->setText("You have cleared " + QString::number(count) + " tiles and have a multiplier of " + QString::number(multiplier*0.99, 'f', 2) + "x");
                     //game_result->setText("You have cleared " +  QString::number(count) + " tiles and have a multiplier of " + multiplier + "x");
                     end_game->setEnabled(true);
                     btn[i][j]->setStyleSheet("background-color: #00FF00;");
